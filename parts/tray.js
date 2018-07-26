@@ -1,4 +1,6 @@
-window.$ = window.jQuery = require('./pptx/lib/jquery.min.js') //fix jquery shit
+var em_trello = require("./common.trello");
+
+
 
 function generatePPT(debs) {
     var pptx = new PptxGenJS();
@@ -49,13 +51,9 @@ function generatePPT(debs) {
     pptx.save('Sample Presentation');
 }
 
+var data = {};
 
-setTimeout(()=> {
-    var pptx = new PptxGenJS();
-    var slide = pptx.addNewSlide();
-    slide.addText('Table Paging Logic Check', { x:0.0, y:'90%', w:'100%', align:'c', fontSize:18, color:'0088CC', fill:'F2F9FC' });
-    var numMargin = 1.25;
-    slide.addShape(pptx.shapes.RECTANGLE, { x:0.0, y:0.0, w:numMargin, h:numMargin, fill:'FFFCCC' });
-    slide.addTable( ['short','table','whatever'], {x:numMargin, y:numMargin, margin:numMargin, colW:2.5, fill:'F1F1F1'} );
-    pptx.save('PptxGenJs-TablePagingLogicCheck')
-}, 5000);
+var app = new Vue({
+    el: '#app',
+    data: data
+})

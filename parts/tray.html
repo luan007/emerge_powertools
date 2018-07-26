@@ -1,0 +1,403 @@
+<html>
+
+<head>
+    <title>Popup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+        * {
+            cursor: default;
+        }
+
+        body,
+        html {
+            user-select: none;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            /* background: rgba(255,255,255,0.); */
+        }
+
+        #app {
+            height: 100%;
+            width: 100%;
+            border-radius: 0px;
+            background: #efefef;
+            /* background: rgba(255,255,255, 0.3); */
+        }
+
+
+        footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            font-size: 10px;
+            font-family: 'Nexa Light';
+        }
+
+        footer:hover>div {
+            transform: translate(0, 0);
+            border-radius: 5px;
+            margin: 8px;
+            transition: transform 0.5s ease, margin 0.3s ease, border-radius 0.2s ease;
+        }
+
+        footer>div {
+            transform: translate(0, 20px);
+            margin: 0px;
+            background: #d93688;
+            color: white;
+            transition: transform 0.5s ease, margin 0.3s ease, border-radius 1s ease;
+            line-height: 27px;
+            padding-left: 10px;
+            vertical-align: middle;
+        }
+
+        footer i {
+            padding-left: 10px;
+        }
+
+        .list {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            top: 30px;
+            left: 0;
+            right: 0;
+            padding-bottom: 5px;
+            overflow-y: auto;
+            /* background: #eee; */
+        }
+
+        .list>div {
+            color: #000;
+            /* background: #fefefe; */
+            border-radius: 5px;
+            margin: 8px 8px;
+            box-sizing: border-box;
+            background: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .list>div:hover {
+            background: #eee;
+        }
+
+        .list>.simple {
+            position: relative;
+            font-size: 14px;
+            padding: 10px;
+            padding-left: 35px;
+            font-weight: lighter;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .list>.simple:nth-child(2n) {
+            background: #e7e7e7;
+        }
+
+        .list>.simple:hover {
+            background: #ffffff;
+        }
+
+        .list>.simple>i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .list>label {
+            display: block;
+            font-size: 10px;
+            color: #000;
+            opacity: 1;
+            font-family: 'Nexa Light';
+            text-align: center;
+            padding: 3px;
+        }
+
+        .list>.simple>input {
+            font-size: 10px;
+            color: #666;
+            /*embedded input..*/
+            border: none;
+            outline: none;
+            background: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: lighter;
+        }
+
+        .list .search-bar {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            font-size: 10px;
+            background: white;
+        }
+
+        .list .notification {
+            background: #ccc;
+        }
+
+        .context {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            /* width: 100%; */
+            height: 30px;
+            line-height: 30px;
+            padding-left: 10px;
+            padding-right: 10px;
+            /* border-bottom: 1px solid #ddd; */
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .context.r {
+            text-align: right;
+        }
+
+        .context>i {
+            height: 20px;
+            width: 20px;
+            line-height: 20px;
+            font-size: 8px;
+            margin-top: -3px;
+            background: #efefef;
+            border-radius: 1000em;
+            text-align: center;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        .context>i:hover {
+            color: #fff;
+            background: #ccc;
+        }
+    </style>
+
+
+    <style>
+        .card {
+            position: relative;
+            font-size: 14px;
+            padding: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 6px;
+            /* background: #2a6aa2 !important; */
+            /* color: white; */
+        }
+
+        .card>div {
+            transition: opacity 0.1s ease;
+            opacity: 1;
+            color: #333;
+        }
+
+        .card:hover>div {
+            opacity: 1;
+        }
+
+        .card-src {
+            font-size: 8px;
+            padding-bottom: 4px;
+            font-weight: lighter;
+        }
+
+        .card-src i {
+            padding-right: 3px;
+        }
+
+        .card .label,
+        label.round {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 1000em;
+            background: #d96436;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: lighter;
+        }
+
+        .card .label i,
+        label.round i {
+            color: white;
+            padding-right: 3px;
+        }
+
+        .card-src span {
+            display: inline-block;
+            padding-right: 8px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: bold;
+            padding-bottom: 3px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .card-content {
+            font-size: 9px;
+            opacity: 0.5;
+            font-weight: lighter;
+            line-height: 1.1em;
+        }
+
+        .card-bigTitle {
+            position: relative;
+            padding-left: 18px;
+            font-size: 13px;
+            font-weight: lighter;
+        }
+
+        .card-bigTitle>i {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            font-size: 0.9em;
+            transform: translate(-50%, -50%);
+        }
+
+        .card:hover .expand {
+            right: 8px;
+            opacity: 0.8;
+        }
+
+        .card .expand {
+            position: absolute;
+            right: 10px;
+            font-size: 0.6em;
+            top: 50%;
+            transform: translate(0, -50%);
+            opacity: 0.2;
+            transition: all 0.1s ease;
+        }
+
+        .bg {
+            background: url('https://cn.bing.com/az/hprichbg/rb/LetchworthSP_EN-CN14482052774_1920x1080.jpg');
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-size: cover;
+            background-position: 50% 50%;
+            opacity: 0.1;
+        }
+    </style>
+
+    <link rel="stylesheet" href="../assets/css/all.css">
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- <div class='bg'></div> -->
+        <div class='context'>
+            <label>HOME /</label>
+        </div>
+
+        <div class='context r'>
+            <span>&nbsp;</span>
+            <i class='fas fa-search'></i>
+        </div>
+
+        <div class='list'>
+            <div class='card'>
+                <div>
+                    <div class="card-bigTitle">
+                        <i class='fab fa-trello'></i> Team Trello
+                    </div>
+                    <i class='expand fas fa-arrow-right'></i>
+                </div>
+            </div>
+            <div class='card'>
+                <div>
+                    <div class="card-bigTitle">
+                        <i class='fab fa-vimeo'></i> Vimeo Download
+                    </div>
+                    <i class='expand fas fa-arrow-right'></i>
+                </div>
+            </div>
+            <div class='card'>
+                <div>
+                    <div class="card-bigTitle">
+                        <i class='far fa-file-powerpoint'></i> Generate
+                        <br>Powerpoint
+                    </div>
+                    <i class='expand fas fa-arrow-right'></i>
+                </div>
+            </div>
+            <div class='card '>
+                <div>
+                    <div class="card-src">
+                        <span>
+                            <i class='fab fa-trello '></i> TRELLO</span>
+                        <div class='label '>
+                            <i class='fas fa-exclamation-circle '></i> INFO
+                        </div>
+                    </div>
+                    <div class="card-title">
+                        Test Title Test Title Test Title Test Title Test Title Test Title Test Title Test Title
+                    </div>
+                    <div class="card-content">
+                        Test Content
+                    </div>
+                </div>
+            </div>
+
+            <!-- 
+            <label>
+                <label class='round' style='background:#666;'>
+                    <i class='fas fa-paste'></i> Clipped</label>
+            </label> 
+            -->
+
+            <!-- <div class='card '>
+                <div>
+                    <div class="card-src">
+                        <span>
+                            <i class='fab fa-trello '></i> TRELLO</span>
+                        <div class='label '>
+                            <i class='fas fa-exclamation-circle '></i> INFO
+                        </div>
+                    </div>
+                    <div class="card-title">
+                        Test Title Test Title Test Title Test Title Test Title Test Title Test Title Test Title
+                    </div>
+                    <div class="card-content">
+                        Test Content
+                    </div>
+                </div>
+            </div> -->
+
+            <label style='opacity: 0.3'>- End Of Content -</label>
+        </div>
+        <footer>
+            <div>
+                EMERGE 2018
+                <i>🎉 Alpha</i>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        window.$ = window.jQuery = require('../lib/pptx/lib/jquery.min.js ') //fix jquery shit
+    </script>
+    <script src="https://api.trello.com/1/client.js?key=e82234ae3f02e078ae7574da740abb7f"></script>
+    <script src='../lib/pptx/lib/jszip.min.js '></script>
+    <script src='../lib/pptx/dist/pptxgen.js '></script>
+    <script src='../lib/vue.min.js '></script>
+    <script src='./tray.js '></script>
+
+</body>
+
+</html>

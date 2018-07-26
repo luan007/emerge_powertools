@@ -1,7 +1,17 @@
-var DEBUG = true;
+var DEBUG = false;
 
 const { app, Menu, Tray, BrowserWindow, ipcMain } = require('electron')
+app.commandLine.appendSwitch('disable-pinch');
 var path = require('path');
+
+function disableZoom(p) {
+    let webContents = p.webContents
+    webContents.on('did-finish-load', () => {
+        webContents.setZoomFactor(1)
+        webContents.setVisualZoomLevelLimits(1, 1)
+        webContents.setLayoutZoomLevelLimits(0, 0)
+    })
+}
 //pop window
 {
     let popup = null;
@@ -9,7 +19,7 @@ var path = require('path');
         if (DEBUG) {
             popup = new BrowserWindow({
                 width: 200,
-                height: 310,
+                height: 300,
                 show: true,
                 frame: true,
                 fullscreenable: false,
@@ -21,8 +31,8 @@ var path = require('path');
         } else {
             popup = new BrowserWindow({
                 width: 200,
-                height: 310,
-                show: false,
+                height: 300,
+                show: true,
                 frame: false,
                 fullscreenable: false,
                 resizable: false,
@@ -31,7 +41,8 @@ var path = require('path');
                 allowRunningInsecureContent: true
             })
         }
-        popup.loadURL('file://' + __dirname + '/tray.html');
+        disableZoom(popup);
+        popup.loadURL('file://' + __dirname + '/parts/tray.html');
         popup.on('blur', () => {
             if (!popup.webContents.isDevToolsOpened()) {
                 popup.hide()
