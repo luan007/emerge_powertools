@@ -76,9 +76,9 @@
             margin: 8px 8px;
             box-sizing: border-box;
             background: #fff;
+            /* background: linear-gradient(to bottom right, #2678E4 0%, #5F48E5 100%); */
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-
 
         .list>div:hover {
             background: #eee;
@@ -246,9 +246,20 @@
 
         .card-content {
             font-size: 9px;
-            opacity: 0.5;
+            opacity: 1;
             font-weight: lighter;
             line-height: 1.1em;
+            word-break: break-word;
+            white-space: pre-line;
+            overflow: hidden;
+        }
+
+        .card-content img {
+            display: block;
+            margin: auto;
+            margin-top: 5px;
+            border-radius: 5px;
+            width: 100%;
         }
 
         .card-bigTitle {
@@ -298,7 +309,6 @@
 </head>
 
 <body>
-
     <div id="app">
         <!-- <div class='bg'></div> -->
         <div class='context'>
@@ -311,7 +321,7 @@
         </div>
 
         <div class='list'>
-            <div class='card'>
+            <!-- <div class='card'>
                 <div>
                     <div class="card-bigTitle">
                         <i class='fab fa-trello'></i> Team Trello
@@ -326,8 +336,36 @@
                     </div>
                     <i class='expand fas fa-arrow-right'></i>
                 </div>
-            </div>
-            <div class='card'>
+            </div> -->
+
+            <template v-for="card in getCards()">
+                <div class='card'>
+                    <div>
+                        <div v-if='card.bigTitle' class="card-bigTitle">
+                            <i v-if='card.bigTitle_ico' v-bind:class='card.bigTitle_ico'></i> {{card.bigTitle}}
+                        </div>
+                        <i v-if='card.more' class='expand fas fa-arrow-right'></i>
+
+                        <div v-if='card.src' class="card-src">
+                            <span>
+                                <i v-if='card.src_ico' v-bind:class='card.src_ico'></i> {{card.src}}</span>
+                            <template v-if='card.labels'>
+                                <div v-for='label in card.labels' class='label'>
+                                    <i v-if='label.ico' v-bind:class='label.ico'></i> {{label.text}}
+                                </div>
+                            </template>
+                        </div>
+                        <div v-if='card.title' class="card-title">
+                            {{card.title}}
+                        </div>
+                        <div v-if='card.content' class="card-content">{{card.content.length > 140 ? card.content.substr(0, 140) + "..." : card.content}}
+                            <img v-if='card.img' v-bind:src='card.img' />
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- <div class='card'>
                 <div>
                     <div class="card-bigTitle">
                         <i class='far fa-file-powerpoint'></i> Generate
@@ -335,24 +373,25 @@
                     </div>
                     <i class='expand fas fa-arrow-right'></i>
                 </div>
-            </div>
-            <div class='card '>
-                <div>
-                    <div class="card-src">
-                        <span>
-                            <i class='fab fa-trello '></i> TRELLO</span>
-                        <div class='label '>
-                            <i class='fas fa-exclamation-circle '></i> INFO
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        Test Title Test Title Test Title Test Title Test Title Test Title Test Title Test Title
-                    </div>
-                    <div class="card-content">
-                        Test Content
-                    </div>
-                </div>
-            </div>
+            </div> -->
+            <!-- <div class='card'> -->
+                <!-- <div> -->
+                    <!-- <div class="card-src"> -->
+                        <!-- <span> -->
+                            <!-- <i class='fab fa-vimeo'></i> VIMEO</span> -->
+                        <!-- <div class='label '>
+                            <i class='fas fa-exclamation-circle '></i> STILL LOADING
+                        </div> -->
+                    <!-- </div> -->
+                    <!-- <div class="card-title"> -->
+                        <!-- Video Title -->
+                    <!-- </div> -->
+                    <!-- <div class="card-content"> -->
+                        <!-- Test Content -->
+                        <!-- <img src='https://i.ytimg.com/vi/BYqs6Xh3e-U/maxresdefault.jpg' /> -->
+                    <!-- </div> -->
+                <!-- </div> -->
+            <!-- </div> -->
 
             <!-- 
             <label>
@@ -378,7 +417,6 @@
                     </div>
                 </div>
             </div> -->
-
             <label style='opacity: 0.3'>- End Of Content -</label>
         </div>
         <footer>
@@ -390,12 +428,13 @@
     </div>
 
     <script>
-        window.$ = window.jQuery = require('../lib/pptx/lib/jquery.min.js ') //fix jquery shit
+        window.$ = window.jQuery = require('jquery') //fix jquery shit
     </script>
     <script src="https://api.trello.com/1/client.js?key=e82234ae3f02e078ae7574da740abb7f"></script>
     <script src='../lib/pptx/lib/jszip.min.js '></script>
     <script src='../lib/pptx/dist/pptxgen.js '></script>
     <script src='../lib/vue.min.js '></script>
+    <script src='../lib/page.js '></script>
     <script src='./tray.js '></script>
 
 </body>

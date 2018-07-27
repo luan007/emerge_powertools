@@ -1,6 +1,8 @@
 var em_trello = require("./common.trello");
 
-
+var plugins = [
+    require("./tool.vimeo")
+];
 
 function generatePPT(debs) {
     var pptx = new PptxGenJS();
@@ -51,9 +53,37 @@ function generatePPT(debs) {
     pptx.save('Sample Presentation');
 }
 
-var data = {};
+var data = {
+    context: {
+        str: ""
+    },
+    plugins: {}
+};
 
-var app = new Vue({
+for (var i = 0; i < plugins.length; i++) {
+    data.plugins[plugins[i].name] = (plugins[i].data);
+}
+
+console.log(data)
+
+window.vm = new Vue({
     el: '#app',
-    data: data
+    data: data,
+    methods: {
+        clipboard: () => { },
+        getCards: function() {
+            var cards = [];
+            for(var i = 0; i < plugins.length; i++) {
+                cards = cards.concat(cards, plugins[i].getCards());
+            }
+            return cards;
+        }
+    },
 })
+
+const { clipboard } = require('electron')
+var cw = require('clipboard-watch');
+//start watcher clipboard change
+cw.watcher(function () {
+    data.context.str = clipboard.readText();
+});
