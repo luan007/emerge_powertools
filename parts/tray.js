@@ -1,7 +1,26 @@
+var router = require("./common.cardRouter");
 var em_trello = require("./common.trello");
+var opener = require('opener');
+
+// em_trello.authroize();
+
+router.on("/", (param) => {
+    // return [{
+    //     bigTitle: "Open Trello",
+    //     bigTitle_ico: {
+    //         fab: 1,
+    //         "fa-trello": 1
+    //     },
+    //     more: true,
+    //     onclick: () => {
+    //         opener("https://trello.com/0em")
+    //     }
+    // }];
+});
 
 var plugins = [
-    require("./tool.vimeo")
+    require("./tool.vimeo"),
+    require("./tool.trello")
 ];
 
 function generatePPT(debs) {
@@ -57,6 +76,8 @@ var data = {
     context: {
         str: ""
     },
+    path: "/",
+    preview: "",
     plugins: {}
 };
 
@@ -69,14 +90,35 @@ console.log(data)
 window.vm = new Vue({
     el: '#app',
     data: data,
-    methods: {
-        clipboard: () => { },
-        getCards: function() {
-            var cards = [];
-            for(var i = 0; i < plugins.length; i++) {
-                cards = cards.concat(cards, plugins[i].getCards());
+    computed: {
+        paths: function() {
+            var p = data.path.split("/");
+            var cache = "";
+            var d = [{
+                label: "home",
+                path: "/"
+            }];
+            for(var i = 0; i < p.length; i++){
+                if(!p[i]) continue;
+                cache += "/" + p[i];
+                d.push({
+                    label: p[i],
+                    path: cache
+                });
             }
-            return cards;
+            return d;
+        }
+    },
+    methods: {
+        getCards: function () {
+            return router.route(data.preview || data.path);
+        },
+        clickOnCard: function (card) {
+            if (card.onclick) {
+                return card.onclick();
+            } else if (card.path) {
+                data.path = card.path;
+            }
         }
     },
 })

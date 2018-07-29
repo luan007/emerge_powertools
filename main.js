@@ -1,4 +1,4 @@
-var DEBUG = false;
+var DEBUG = true;
 
 const { app, Menu, Tray, BrowserWindow, ipcMain } = require('electron')
 app.commandLine.appendSwitch('disable-pinch');
@@ -26,7 +26,10 @@ function disableZoom(p) {
                 resizable: true,
                 transparent: false,
                 webSecurity: false,
-                allowRunningInsecureContent: true
+                allowRunningInsecureContent: true,
+                webPreferences: {
+                    preload: path.join(__dirname, 'injector.js') // 但预加载的 js 文件内仍可以使用 Nodejs 的 API
+                }
             })
         } else {
             popup = new BrowserWindow({
@@ -38,7 +41,7 @@ function disableZoom(p) {
                 resizable: false,
                 transparent: true,
                 webSecurity: false,
-                allowRunningInsecureContent: true
+                allowRunningInsecureContent: true,
             })
         }
         disableZoom(popup);
@@ -88,7 +91,9 @@ function disableZoom(p) {
         const position = getWindowPosition()
         popup.setPosition(position.x, position.y, false)
         popup.show()
+        popup.setVisibleOnAllWorkspaces(true);
         popup.focus()
+        popup.setVisibleOnAllWorkspaces(false);
     }
 
     ipcMain.on('show-window', () => {

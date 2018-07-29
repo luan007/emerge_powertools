@@ -1,9 +1,29 @@
 var youtubedl = require('youtube-dl');
+var router = require("./common.cardRouter");
+
 
 var cache = {};
 module.exports.data = cache;
 module.exports.name = "video";
-module.exports.getCards = function () {
+
+function getVideoCount() {
+    return Object.keys(cache).length;
+}
+
+router.on("/", (param) => {
+    return [{
+        bigTitle: "Videos " + (getVideoCount() ? ("(" + getVideoCount() + ")") : ""),
+        bigTitle_ico: {
+            fas: 1,
+            "fa-video": 1
+        },
+        more: true,
+        path: "/video"
+    }];
+});
+
+
+router.on("/video", (param) => {
     var ret = [];
     for (var i in cache) {
         if (!cache[i]) continue;
@@ -37,7 +57,7 @@ module.exports.getCards = function () {
         }
     }
     return ret;
-};
+});
 
 const { clipboard } = require('electron')
 var cw = require('clipboard-watch');
