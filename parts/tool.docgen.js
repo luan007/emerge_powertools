@@ -4,6 +4,8 @@ var cache = {};
 module.exports.data = cache;
 module.exports.name = "docgen";
 
+
+
 router.on("/", (param) => {
     return [{
         src: "Document Generator",
@@ -18,7 +20,21 @@ router.on("/", (param) => {
         actions: [
             {
                 type: "button",
-                text: "test"
+                text: "Download",
+                ico: {
+                    fas: 1,
+                    "fa-download": 1
+                }
+            }
+        ],
+        operators: [
+            {
+                color: "#ff0000",
+                text: "Download",
+                ico: {
+                    fas: 1,
+                    "fa-download": 1
+                }
             }
         ]
     }];

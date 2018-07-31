@@ -169,11 +169,13 @@
 
     <style>
         .card {
+            /* -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC); */
             color: #000;
             /* background: #fefefe; */
             border-radius: 5px;
             margin: 8px 8px;
             box-sizing: border-box;
+            z-index: 1;
             background: #fff;
             /* background: linear-gradient(to bottom right, #2678E4 0%, #5F48E5 100%); */
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -184,6 +186,7 @@
         }
 
         .card {
+            overflow: hidden;
             position: relative;
             font-size: 14px;
             padding: 8px;
@@ -195,9 +198,10 @@
         }
 
         .card>div {
-            transition: opacity 0.1s ease;
+            transition: all 0.3s ease;
             opacity: 1;
             color: #333;
+            position: relative;
         }
 
         .card:hover>div {
@@ -281,13 +285,13 @@
         }
 
         .card:hover .expand {
-            right: 8px;
+            right: 4px;
             opacity: 0.8;
         }
 
         .card .expand {
             position: absolute;
-            right: 10px;
+            right: 5px;
             font-size: 0.6em;
             top: 50%;
             transform: translate(0, -50%);
@@ -335,11 +339,12 @@
         }
 
         .card-actions {
-            display: none;
+            /* display: none; */
+            height: 0;
         }
 
         .card:hover .card-actions {
-            display: block;
+            height: auto;
         }
 
         .card-actions>div {
@@ -352,11 +357,11 @@
             padding: 3px 5px;
             border-radius: 3px;
             background: #fff;
-            color: #555;
+            color: #888;
             font-weight: lighter;
             font-size: 8px;
             transition: all 0.1s ease;
-            /* box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); */
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
         }
 
         .card-button:hover {
@@ -366,6 +371,75 @@
 
         .card-button>i {
             margin-right: 3px;
+        }
+
+        .card-container {
+            position: relative;
+        }
+
+        .card-operator>.operator {
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding-left: 5px;
+            padding-right: 5px;
+            font-size: 0.5em;
+            font-weight: lighter;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            color: white;
+            opacity: 0;
+            line-height: 100%;
+            transition: all 0.5s ease;
+            min-width: 30px;
+            justify-content: space-around;
+        }
+
+        .card-operator>.operator i {
+            display: block;
+            padding-bottom: 3px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .card-operator {
+            position: absolute !important;
+            right: 5px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-wrap: nowrap;
+            transform: translate(100%, 0%);
+            transition: all 0.2s ease !important;
+        }
+
+        .card.op .card-operator,
+        .card-operator:hover {
+            right: 0px;
+            transform: translate(0%, 0%);
+        }
+
+        .card.op .card-operator .operator,
+        .card-operator:hover .operator {
+            opacity: 0.6;
+        }
+
+        .operator:hover {
+            opacity: 1 !important;
+        }
+
+        /* .card-operator-handle {
+            position: absolute;
+            height: 100%;
+            width: 5px;
+            background: #fff;
+            left: -5px;
+            top: 0;
+        } */
+
+        .card.op .card-warp {
+            opacity: 0.5;
+            transform: translateX(-30%);
         }
     </style>
 
@@ -412,31 +486,41 @@
             <template v-for="cards in getCards()">
                 <label v-if="getCards() && getCards().length > 1">{{cards.name}}</label>
                 <template v-for="card in cards">
-                    <div class='card' v-on:click="clickOnCard(card)">
-                        <div>
-                            <div v-if='card.bigTitle' class="card-bigTitle">
-                                <i v-if='card.bigTitle_ico' v-bind:class='card.bigTitle_ico'></i> {{card.bigTitle}}
+                    <div class='card-container'>
+                        <div class='card' v-on:click="clickOnCard(card)">
+                            <div class='card-warp'>
+                                <div v-if='card.bigTitle' class="card-bigTitle">
+                                    <i v-if='card.bigTitle_ico' v-bind:class='card.bigTitle_ico'></i> {{card.bigTitle}}
+                                </div>
+                                <i v-if='card.more' class='expand fas fa-arrow-right'></i>
+                                <div v-if='card.src' class="card-src">
+                                    <span>
+                                        <i v-if='card.src_ico' v-bind:class='card.src_ico'></i> {{card.src}}</span>
+                                    <template v-if='card.labels'>
+                                        <div v-for='label in card.labels' class='label'>
+                                            <i v-if='label.ico' v-bind:class='label.ico'></i> {{label.text}}
+                                        </div>
+                                    </template>
+                                </div>
+                                <div v-if='card.title' class="card-title">
+                                    {{card.title}}
+                                </div>
+                                <div v-if='card.content' class="card-content">{{card.content.length > 140 ? card.content.substr(0, 140) + "..." : card.content}}
+                                    <img v-if='card.img' v-bind:src='card.img' />
+                                </div>
+                                <div v-if='card.actions' class='card-actions'>
+                                    <div v-if='action.type == "button"' v-for='action in card.actions' v-on:click="action.onclick ? action.onclick() : ()=>{}"
+                                        class='card-button'>
+                                        <i v-if='action.ico' v-bind:class='action.ico'></i>{{action.text}}</div>
+                                </div>
                             </div>
-                            <i v-if='card.more' class='expand fas fa-arrow-right'></i>
-                            <div v-if='card.src' class="card-src">
-                                <span>
-                                    <i v-if='card.src_ico' v-bind:class='card.src_ico'></i> {{card.src}}</span>
-                                <template v-if='card.labels'>
-                                    <div v-for='label in card.labels' class='label'>
-                                        <i v-if='label.ico' v-bind:class='label.ico'></i> {{label.text}}
+                            <div v-if='card.operators' class='card-operator'>
+                                <div v-for='op in card.operators' class="operator" v-bind:style='{backgroundColor: op.color || "#ccc"}'>
+                                    <div v-on:click="op.onclick ? op.onclick() : ()=>{}">
+                                        <i v-if="op.ico" v-bind:class='op.ico'></i>
+                                        <span>{{op.text}}</span>
                                     </div>
-                                </template>
-                            </div>
-                            <div v-if='card.title' class="card-title">
-                                {{card.title}}
-                            </div>
-                            <div v-if='card.content' class="card-content">{{card.content.length > 140 ? card.content.substr(0, 140) + "..." : card.content}}
-                                <img v-if='card.img' v-bind:src='card.img' />
-                            </div>
-                            <div v-if='card.actions' class='card-actions'>
-                                <div v-if='action.type == "button"' v-for='action in card.actions' v-on:click="action.onclick ? action.onclick() : ()=>{}"
-                                    class='card-button'>
-                                    <i v-if='action.ico' v-bind:class='action.ico'></i>{{action.text}}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
