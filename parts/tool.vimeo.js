@@ -7,21 +7,30 @@ module.exports.data = cache;
 module.exports.name = "video";
 
 function getVideoCount() {
-    return Object.keys(cache).length;
+    var j = 0;
+    for(var i in cache) {
+        if(cache[i]) {
+            j++;
+        }
+    }
+    return j;
 }
 
 router.on("/", (param) => {
-    return [{
-        bigTitle: "Videos " + (getVideoCount() ? ("(" + getVideoCount() + ")") : ""),
-        bigTitle_ico: {
-            fas: 1,
-            "fa-video": 1
-        },
-        more: true,
-        path: "/video"
-    }];
-});
-
+    if (getVideoCount() > 0) {
+        return [{
+            bigTitle: "Videos " + (getVideoCount() ? ("(" + getVideoCount() + ")") : ""),
+            bigTitle_ico: {
+                fas: 1,
+                "fa-video": 1
+            },
+            more: true,
+            path: "/video"
+        }];
+    } else {
+        return undefined;
+    }
+}, false, "Clipboarded Videos");
 
 router.on("/video", (param) => {
     var ret = [];
@@ -57,7 +66,7 @@ router.on("/video", (param) => {
         }
     }
     return ret;
-});
+}, true);
 
 const { clipboard } = require('electron')
 var cw = require('clipboard-watch');

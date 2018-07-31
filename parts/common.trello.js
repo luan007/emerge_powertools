@@ -7,6 +7,7 @@ const store = new Store();
 var package = {
     trello: new Trello('e82234ae3f02e078ae7574da740abb7f', store.get('trello-token')),
     authenticated: false,
+    validating: false,
     fetchToken: () => {
         return opener('https://trello.com/1/connect?key=e82234ae3f02e078ae7574da740abb7f&name=Emerge&scope=read,write&expiration=never&response_type=token&return_url=http://localhost:9483/oauthCb');
     },
@@ -19,8 +20,35 @@ module.exports.package = package;
 
 var opener = require('opener');
 var express = require('express');
+var bodyParser = require('body-parser');
+var serveStatic = require('serve-static');
+var http = require('http');
+var https = require('https');
 var app = express();
-var uri = require('url');
+
+app.use(bodyParser.json());
+app.use(serveStatic(__dirname + "/trello_powerup"));
+var fs = require('fs');
+
+//同步读取密钥和签名证书
+var options = {
+    key: fs.readFileSync(__dirname + '/certs/key.pem'),
+    cert: fs.readFileSync(__dirname + '/certs/cert.pem')
+}
+
+//powerups
+app.post("/pptx/:type", (req, res) => {
+    if(req.params.type == 'list') {
+        console.log(req.body);
+    } else if(req.params.type == 'card') {
+        console.log(req.body);
+    }
+    res.end();
+});
+
+app.get("/", (req, res) => {
+    res.send("Server is running").end();
+});
 
 app.get("/oauthCb", (req, res) => {
     res.send(`
@@ -42,7 +70,7 @@ app.get("/token/:t", (req, res) => {
         return res.end();
     }
     store.set("trello-token", token);
-    module.exports.package.trello = new Trello('e82234ae3f02e078ae7574da740abb7f', store.get('trello-token'));
+    package.trello = new Trello('e82234ae3f02e078ae7574da740abb7f', store.get('trello-token'));
     validate((r) => {
         if (r) {
             res.send("Success").end();
@@ -53,7 +81,6 @@ app.get("/token/:t", (req, res) => {
 });
 
 function doUpdate() {
-
     package.trello.get("/1/organizations/5b3ddeb157dfd39616c9e692/tags", {}, (e, s) => {
         if (e) return;
         Vue.set(package.fullData, "tags", s);
@@ -65,9 +92,10 @@ function doUpdate() {
                 s[i].cards = [];
                 (() => {
                     let b = s[i];
-                    package.trello.get("/1/boards/" + b.id, { cards: 'all', card_pluginData: true, lists: "all", "idTags": true }, (e, t) => {
-                        Vue.set(b, "lists", s.lists);
-                        Vue.set(b, "cards", s.cards);
+                    package.trello.get("/1/boards/" + b.id, { cards: 'all', card_pluginData: true, lists: "all", "idTags": true, "card_attachments": true }, (e, t) => {
+                        console.log(t.lists);
+                        Vue.set(b, "lists", t.lists);
+                        Vue.set(b, "cards", t.cards);
                         b.loading = false;
                     });
                 })();
@@ -80,11 +108,10 @@ function doUpdate() {
 }
 
 function onValidated() {
-    doUpdate();
+    // doUpdate();
 }
 
 // var t = new Trello("e82234ae3f02e078ae7574da740abb7f", "");
-
 function validate(cb) {
     cb = cb || (() => { });
     if (!store.get('trello-token')) {
@@ -92,7 +119,9 @@ function validate(cb) {
         cb(false);
         return;
     }
+    package.validating = true;
     package.trello.get("/1/members/me", function (err, data) {
+        package.validating = false;
         if (err) {
             package.authenticated = false;
             cb(false);
@@ -107,6 +136,9 @@ function validate(cb) {
     });
 }
 
-app.listen(9483);
+var httpsServer = https.createServer(options, app);
+var httpServer = http.createServer(app);
+httpServer.listen(9483);
+httpsServer.listen(9484);
 
 validate();

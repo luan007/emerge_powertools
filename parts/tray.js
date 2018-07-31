@@ -20,7 +20,8 @@ router.on("/", (param) => {
 
 var plugins = [
     require("./tool.vimeo"),
-    require("./tool.trello")
+    require("./tool.docgen"),
+    require("./tool.trello"),
 ];
 
 function generatePPT(debs) {
@@ -77,6 +78,7 @@ var data = {
         str: ""
     },
     path: "/",
+    prev_path: [],
     preview: "",
     plugins: {}
 };
@@ -86,6 +88,19 @@ for (var i = 0; i < plugins.length; i++) {
 }
 
 console.log(data)
+
+function pushState(path) {
+    var prev = data.path;
+    data.path = path;
+    if(path == '/') {
+        while(data.prev_path.length) data.prev_path.pop();
+        return;
+    }
+    if(data.prev_path[data.prev_path.length - 1] != prev) {
+        data.prev_path.push(prev);
+        console.log(data.prev_path);
+    }
+}
 
 window.vm = new Vue({
     el: '#app',
@@ -110,6 +125,7 @@ window.vm = new Vue({
         }
     },
     methods: {
+        pushState: pushState,
         getCards: function () {
             return router.route(data.preview || data.path);
         },
@@ -117,7 +133,7 @@ window.vm = new Vue({
             if (card.onclick) {
                 return card.onclick();
             } else if (card.path) {
-                data.path = card.path;
+                pushState(card.path);
             }
         }
     },
