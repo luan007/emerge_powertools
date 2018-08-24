@@ -229,12 +229,14 @@
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             font-weight: lighter;
+            margin: 0px 2px 2px 0px;
         }
 
         .card .label i,
         label.round i {
             color: white;
-            padding-right: 3px;
+            /* padding-right: 3px; */
+            margin-right: 0px;
         }
 
         .card-src span {
@@ -249,6 +251,10 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+        }
+
+        .card-title.raw {
+            white-space: initial !important;
         }
 
         .card-content {
@@ -269,6 +275,13 @@
             width: 100%;
         }
 
+        .card-content.rawcontent {
+            white-space: initial !important;
+        }
+
+        .card-content.rawcontent * {}
+
+
         .card-bigTitle {
             position: relative;
             padding-left: 18px;
@@ -276,7 +289,7 @@
             font-weight: lighter;
         }
 
-        .card-bigTitle>i {
+        .card-bigTitle>.card-bigTitle-iconContainer {
             position: absolute;
             left: 5px;
             top: 50%;
@@ -465,7 +478,7 @@
             <i class='fas fa-search'></i>
         </div>
 
-        
+
         <div class='list'>
             <!-- <div class='card'>
                 <div>
@@ -491,24 +504,31 @@
                         <div class='card' v-on:click="clickOnCard(card)">
                             <div class='card-warp'>
                                 <div v-if='card.bigTitle' class="card-bigTitle">
-                                    <i v-if='card.bigTitle_ico' v-bind:class='card.bigTitle_ico'></i> {{card.bigTitle}}
+                                    <div class='card-bigTitle-iconContainer'>
+                                        <i v-if='card.bigTitle_ico' v-bind:class='card.bigTitle_ico'></i>
+                                    </div>{{card.bigTitle}}
                                 </div>
                                 <i v-if='card.more' class='expand fas fa-arrow-right'></i>
                                 <div v-if='card.src' class="card-src">
                                     <span>
                                         <i v-if='card.src_ico' v-bind:class='card.src_ico'></i> {{card.src}}</span>
-                                    <template v-if='card.labels'>
-                                        <div v-for='label in card.labels' class='label'>
+                                    <div v-if='card.labels && card.labels.length > 0' style='margin-top:5px'>
+                                        <div v-for='label in card.labels' class='label' v-bind:style='label.style || {}'>
                                             <i v-if='label.ico' v-bind:class='label.ico'></i> {{label.text}}
                                         </div>
-                                    </template>
+                                    </div>
                                 </div>
                                 <div v-if='card.title' class="card-title">
                                     {{card.title}}
                                 </div>
-                                <div v-if='card.content' class="card-content">{{card.content.length > 140 ? card.content.substr(0, 140) + "..." : card.content}}
+                                <div v-if='card.raw_title' class="card-title raw">
+                                    {{card.raw_title}}
+                                </div>
+                                <div v-if='card.content' class="card-content">{{card.content.length > 140 ? card.content.substr(0,
+                                    140) + "..." : card.content}}
                                     <img v-if='card.img' v-bind:src='card.img' />
                                 </div>
+                                <div v-if='card.raw_content' v-html="card.raw_content" class="card-content rawcontent"></div>
                                 <div v-if='card.actions' class='card-actions'>
                                     <div v-if='action.type == "button"' v-for='action in card.actions' v-on:click="action.onclick ? action.onclick() : ()=>{}"
                                         class='card-button'>
