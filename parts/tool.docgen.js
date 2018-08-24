@@ -5,7 +5,6 @@ module.exports.data = cache;
 module.exports.name = "docgen";
 
 
-
 router.on("/", (param) => {
     return [{
         src: "Document Generator",

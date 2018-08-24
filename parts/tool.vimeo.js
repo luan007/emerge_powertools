@@ -1,4 +1,4 @@
-var youtubedl = require('youtube-dl');
+var video = require("./common.youtubedl");
 var router = require("./common.cardRouter");
 
 
@@ -72,24 +72,22 @@ const { clipboard } = require('electron')
 var cw = require('clipboard-watch');
 cw.watcher(function () {
     var s = clipboard.readText();
-
     if (!(s.indexOf("vimeo") >= 0 || s.indexOf("youtube") >= 0)) {
         return;
     }
-
     if (cache[s]) {
         return;
     } else {
         Vue.set(cache, s, { loading: 1, type: s.indexOf("vimeo") >= 0 ? "v" : "y" })
-        vm.$forceUpdate()
-        youtubedl.getInfo(s, ['--proxy=socks5://127.0.0.1:1086'], { maxBuffer: 1000 * 1024 }, function (err, info) {
+        tick();
+        video.fetch(s, function (err, info) {
             if (err) {
                 cache[s] = undefined;
                 return;
             }
             info.type = s.indexOf("vimeo") >= 0 ? "v" : "y";
             Vue.set(cache, s, info);
-            vm.$forceUpdate()
+            tick();
             // console.log('id:', info.id);
             // console.log('title:', info.title);
             // console.log('url:', info.url);

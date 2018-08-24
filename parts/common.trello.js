@@ -1,4 +1,5 @@
 var Trello = require('node-trello');
+var docgen = require("./common.docgen");
 const Store = require('electron-store');
 const store = new Store();
 
@@ -38,10 +39,11 @@ var options = {
 
 //powerups
 app.post("/pptx/:type", (req, res) => {
-    if(req.params.type == 'list') {
-        console.log(req.body);
-    } else if(req.params.type == 'card') {
-        console.log(req.body);
+    console.log(req.body);
+    if (req.params.type == 'list') {
+    } else if (req.params.type == 'card') {
+        var dt = docgen.parse_card(req.body); //from card to url list..
+        docgen.queue(req.body.id, dt);
     }
     res.end();
 });

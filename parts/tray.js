@@ -2,6 +2,7 @@ var router = require("./common.cardRouter");
 var em_trello = require("./common.trello");
 var opener = require('opener');
 
+
 // em_trello.authroize();
 
 router.on("/", (param) => {
@@ -20,7 +21,8 @@ router.on("/", (param) => {
 
 var plugins = [
     require("./tool.vimeo"),
-    require("./tool.docgen"),
+    require("./tool.feed"),
+    // require("./tool.docgen"),
     require("./tool.trello"),
 ];
 
@@ -80,14 +82,12 @@ var data = {
     path: "/",
     prev_path: [],
     preview: "",
-    plugins: {}
+    plugins: {},
 };
 
 for (var i = 0; i < plugins.length; i++) {
     data.plugins[plugins[i].name] = (plugins[i].data);
 }
-
-console.log(data)
 
 function pushState(path) {
     var prev = data.path;
@@ -122,22 +122,28 @@ window.vm = new Vue({
                 });
             }
             return d;
-        }
+        },
     },
     methods: {
         pushState: pushState,
-        getCards: function () {
-            return router.route(data.preview || data.path);
-        },
         clickOnCard: function (card) {
             if (card.onclick) {
                 return card.onclick();
             } else if (card.path) {
                 pushState(card.path);
             }
+        },
+        getCards: function () {
+            return router.route(data.preview || data.path);
         }
     },
 })
+
+global.tick = function() {
+    Vue.nextTick(()=>{
+        vm.$forceUpdate();
+    });
+}
 
 const { clipboard } = require('electron')
 var cw = require('clipboard-watch');
@@ -145,3 +151,4 @@ var cw = require('clipboard-watch');
 cw.watcher(function () {
     data.context.str = clipboard.readText();
 });
+
